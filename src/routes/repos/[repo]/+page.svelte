@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
 	import WatchButton from '#lib/components/WatchButton.svelte';
-	import { timeAgo } from '#lib/utils';
+	import { threadPath, timeAgo } from '#lib/utils';
 
 	let { data }: PageProps = $props();
 
@@ -44,6 +44,7 @@
 								#{pr.number} · opened by {pr.user?.login ?? 'unknown'} · updated {timeAgo(pr.updated_at)}
 							</div>
 						</div>
+						<a class="thread-link" href={threadPath(data.fullName, pr.number)} title="Cross-references">⇄</a>
 						<WatchButton
 							kind="pr"
 							repo={data.fullName}
@@ -76,6 +77,7 @@
 								#{issue.number} · opened by {issue.user?.login ?? 'unknown'} · updated {timeAgo(issue.updated_at)}
 							</div>
 						</div>
+						<a class="thread-link" href={threadPath(data.fullName, issue.number)} title="Cross-references">⇄</a>
 						<WatchButton
 							kind="issue"
 							repo={data.fullName}

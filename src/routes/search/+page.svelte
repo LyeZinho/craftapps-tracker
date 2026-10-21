@@ -2,7 +2,7 @@
 	import type { PageProps } from './$types';
 	import WatchButton from '#lib/components/WatchButton.svelte';
 	import StateBadge from '#lib/components/StateBadge.svelte';
-	import { repoFullNameFromIssue, timeAgo } from '#lib/utils';
+	import { repoFullNameFromIssue, threadPath, timeAgo } from '#lib/utils';
 
 	let { data }: PageProps = $props();
 
@@ -53,15 +53,19 @@
 		{:else}
 			<ul class="list">
 				{#each data.issues as issue (issue.html_url)}
+					{@const issueRepo = repoFullNameFromIssue(issue)}
 					<li>
 						<div class="item-row">
 							<div class="item-body">
 								<a class="item-title" href={issue.html_url} target="_blank" rel="noreferrer">{issue.title}</a>
 								<div class="item-meta">
-									<span class="mono">{repoFullNameFromIssue(issue) ?? ''}</span>
+									<span class="mono">{issueRepo ?? ''}</span>
 									· #{issue.number} · by {issue.user?.login ?? 'unknown'} · updated {timeAgo(issue.updated_at)}
 								</div>
 							</div>
+							{#if issueRepo}
+								<a class="thread-link" href={threadPath(issueRepo, issue.number)} title="Cross-references">⇄</a>
+							{/if}
 							<StateBadge state={issue.state} />
 							<WatchButton
 								kind="issue"
@@ -81,15 +85,19 @@
 		{:else}
 			<ul class="list">
 				{#each data.prs as pr (pr.html_url)}
+					{@const prRepo = repoFullNameFromIssue(pr)}
 					<li>
 						<div class="item-row">
 							<div class="item-body">
 								<a class="item-title" href={pr.html_url} target="_blank" rel="noreferrer">{pr.title}</a>
 								<div class="item-meta">
-									<span class="mono">{repoFullNameFromIssue(pr) ?? ''}</span>
+									<span class="mono">{prRepo ?? ''}</span>
 									· #{pr.number} · by {pr.user?.login ?? 'unknown'} · updated {timeAgo(pr.updated_at)}
 								</div>
 							</div>
+							{#if prRepo}
+								<a class="thread-link" href={threadPath(prRepo, pr.number)} title="Cross-references">⇄</a>
+							{/if}
 							<StateBadge state={pr.state} />
 							<WatchButton
 								kind="pr"

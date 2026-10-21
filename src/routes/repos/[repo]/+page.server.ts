@@ -3,17 +3,21 @@ import type { PageServerLoad } from './$types';
 import { gh, ORG, GitHubError } from '#lib/server/github';
 import type { Commit, Pr, Repo, SearchIssue } from '#lib/types';
 
-export const load: PageServerLoad = async ({ params }) => {
+export const load: PageServerLoad = async ({ params, fetch }) => {
 	const name = params.repo;
 	try {
 		const [repo, pulls, issues, commits, readme] = await Promise.allSettled([
-			gh<Repo>(`/repos/${ORG}/${name}`, { ttl: 60_000 }),
-			gh<Pr[]>(`/repos/${ORG}/${name}/pulls?state=open&per_page=50`, { ttl: 60_000 }),
-			gh<SearchIssue[]>(`/repos/${ORG}/${name}/issues?state=open&per_page=50`, { ttl: 60_000 }),
-			gh<Commit[]>(`/repos/${ORG}/${name}/commits?per_page=30`, { ttl: 60_000 }),
+			gh<Repo>(`/repos/${ORG}/${name}`, { ttl: 60_000, fetch }),
+			gh<Pr[]>(`/repos/${ORG}/${name}/pulls?state=open&per_page=50`, { ttl: 60_000, fetch }),
+			gh<SearchIssue[]>(`/repos/${ORG}/${name}/issues?state=open&per_page=50`, {
+				ttl: 60_000,
+				fetch
+			}),
+			gh<Commit[]>(`/repos/${ORG}/${name}/commits?per_page=30`, { ttl: 60_000, fetch }),
 			gh<string>(`/repos/${ORG}/${name}/readme`, {
 				ttl: 300_000,
-				accept: 'application/vnd.github.html+json'
+				accept: 'application/vnd.github.html+json',
+				fetch
 			})
 		]);
 

@@ -2,7 +2,7 @@ import type { PageServerLoad } from './$types';
 import { search, ORG, GitHubError } from '#lib/server/github';
 import type { SearchCommit, SearchIssue } from '#lib/types';
 
-export const load: PageServerLoad = async ({ url }) => {
+export const load: PageServerLoad = async ({ url, fetch }) => {
 	const q = url.searchParams.get('q')?.trim() ?? '';
 	const tabParam = url.searchParams.get('tab');
 	const tab: 'issues' | 'prs' | 'commits' =
@@ -14,9 +14,9 @@ export const load: PageServerLoad = async ({ url }) => {
 
 	try {
 		const [issues, prs, commits] = await Promise.all([
-			search<SearchIssue>(`org:${ORG} is:issue ${q}`, { perPage: 30 }),
-			search<SearchIssue>(`org:${ORG} is:pr ${q}`, { perPage: 30 }),
-			search<SearchCommit>(`org:${ORG} ${q}`, { kind: 'commits', perPage: 30 })
+			search<SearchIssue>(`org:${ORG} is:issue ${q}`, { perPage: 30, fetch }),
+			search<SearchIssue>(`org:${ORG} is:pr ${q}`, { perPage: 30, fetch }),
+			search<SearchCommit>(`org:${ORG} ${q}`, { kind: 'commits', perPage: 30, fetch })
 		]);
 		return {
 			q,

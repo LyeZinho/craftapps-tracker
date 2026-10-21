@@ -16,3 +16,8 @@ export function timeAgo(date: string): string {
 	if (days < 30) return `${days}d ago`;
 	return new Date(date).toLocaleDateString();
 }
+
+/** App-internal path to the cross-mention thread view of an issue/PR. */
+export function threadPath(repo: string, number: number): string {
+	return `/thread/${repo}/${number}`;
+}

@@ -52,14 +52,17 @@ function buildFeed(issues: SearchIssue[], events: OrgEvent[]): ActivityItem[] {
 	return items.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 }
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ fetch }) => {
 	try {
 		const [repos, recentIssues, openPrs, openIssues, events] = await Promise.all([
-			gh<Repo[]>(`/orgs/${ORG}/repos?per_page=100&sort=pushed&type=org`, { ttl: 120_000 }),
-			search<SearchIssue>(`org:${ORG}`, { perPage: 40 }),
-			search<SearchIssue>(`org:${ORG} type:pr is:open`, { perPage: 1 }),
-			search<SearchIssue>(`org:${ORG} type:issue is:open`, { perPage: 1 }),
-			gh<OrgEvent[]>(`/orgs/${ORG}/events?per_page=60`, { ttl: 60_000 }).catch(
+			gh<Repo[]>(`/orgs/${ORG}/repos?per_page=100&sort=pushed&type=org`, {
+				ttl: 120_000,
+				fetch
+			}),
+			search<SearchIssue>(`org:${ORG}`, { perPage: 40, fetch }),
+			search<SearchIssue>(`org:${ORG} type:pr is:open`, { perPage: 1, fetch }),
+			search<SearchIssue>(`org:${ORG} type:issue is:open`, { perPage: 1, fetch }),
+			gh<OrgEvent[]>(`/orgs/${ORG}/events?per_page=60`, { ttl: 60_000, fetch }).catch(
 				() => [] as OrgEvent[]
 			)
 		]);

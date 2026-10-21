@@ -17,7 +17,7 @@ interface TrackedResponseItem {
 	html_url: string;
 }
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, fetch }) => {
 	const body = (await request.json()) as { items?: TrackedRequestItem[] };
 	const items = (body.items ?? []).slice(0, 25);
 
@@ -25,7 +25,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		items.map(async (item): Promise<TrackedState> => {
 			const data = await gh<TrackedResponseItem>(
 				`/repos/${item.repo}/${item.kind === 'pr' ? 'pulls' : 'issues'}/${item.number}`,
-				{ ttl: 0 }
+				{ ttl: 0, fetch }
 			);
 			return {
 				repo: item.repo,

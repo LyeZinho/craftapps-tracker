@@ -1,6 +1,6 @@
 <script lang="ts">
 	import StateBadge from './StateBadge.svelte';
-	import { repoFullNameFromIssue, timeAgo } from '#lib/utils';
+	import { repoFullNameFromIssue, threadPath, timeAgo } from '#lib/utils';
 	import type { ActivityItem } from '#lib/types';
 
 	let { items, max = 60 }: { items: ActivityItem[]; max?: number } = $props();
@@ -26,6 +26,7 @@
 			{:else}
 				{@const issue = item.issue}
 				{@const isPr = Boolean(issue.pull_request)}
+				{@const repoName = repoFullNameFromIssue(issue)}
 				<span class="activity-icon {isPr ? 'pr' : 'issue'}" title={isPr ? 'Pull request' : 'Issue'}>
 					{isPr ? '⎇' : '●'}
 				</span>
@@ -34,12 +35,15 @@
 						{issue.title}
 					</a>
 					<div class="activity-meta">
-						<span class="mono">{repoFullNameFromIssue(issue) ?? 'unknown-repo'}</span>
+						<span class="mono">{repoName ?? 'unknown-repo'}</span>
 						· {isPr ? 'PR' : 'issue'} #{issue.number}
 						· opened by {issue.user?.login ?? 'unknown'}
 						· <span title={new Date(item.date).toLocaleString()}>{timeAgo(item.date)}</span>
 					</div>
 				</div>
+				{#if repoName}
+					<a class="thread-link" href={threadPath(repoName, issue.number)} title="Cross-references">⇄</a>
+				{/if}
 				<StateBadge state={isPr && issue.state === 'closed' ? 'merged' : issue.state} />
 			{/if}
 		</li>

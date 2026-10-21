@@ -11,6 +11,12 @@ org — repositories, pull requests, issues and commits, in a single SvelteKit d
   README, each with one-click watching.
 - **Cross-repo search** (`/search`) — one query searched across all issues, PRs and commits at once,
   with tabbed results and counts.
+- **Cross-reference threads** (`/thread/[owner]/[repo]/[number]`) — the full mention web around any
+  issue or PR: which items reference it (from the GitHub timeline API's `cross-referenced` events),
+  which items it references (parsed from its description and top comments, including `#123`,
+  `owner/repo#123` and github.com URLs — even cross-repo), which commits link to it
+  (`referenced`/`committed` timeline events) and which users were @-mentioned. Reach it via the ⇄
+  button on any issue/PR row.
 - **Watchlist** (`/watchlist`) — star PRs/issues to track them; stored in your browser, with a
   "refresh state" button that pulls their latest status from GitHub.
 

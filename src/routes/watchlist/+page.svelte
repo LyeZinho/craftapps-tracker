@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { watchlist } from '#lib/watchlist.svelte';
 	import StateBadge from '#lib/components/StateBadge.svelte';
-	import { timeAgo } from '#lib/utils';
+	import { threadPath, timeAgo } from '#lib/utils';
 	import type { TrackedState } from '#lib/types';
 
 	let refreshing = $state(false);
@@ -78,6 +78,7 @@
 									<span class="mono">{item.repo}</span> · #{item.number} · updated {timeAgo(item.updatedAt)}
 								</div>
 							</div>
+							<a class="thread-link" href={threadPath(item.repo, item.number)} title="Cross-references">⇄</a>
 							<StateBadge state={item.state} />
 							<button
 								class="watch-btn"
@@ -104,6 +105,7 @@
 									<span class="mono">{item.repo}</span> · #{item.number} · updated {timeAgo(item.updatedAt)}
 								</div>
 							</div>
+							<a class="thread-link" href={threadPath(item.repo, item.number)} title="Cross-references">⇄</a>
 							<StateBadge state={item.state} />
 							<button
 								class="watch-btn"

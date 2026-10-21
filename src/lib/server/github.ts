@@ -27,7 +27,7 @@ const cache = new Map<string, CacheEntry>();
 /** Raw GitHub API GET with a tiny in-memory TTL cache (default 60s). */
 export async function gh<T>(
 	path: string,
-	opts: { ttl?: number; accept?: string } = {}
+	opts: { ttl?: number; accept?: string; fetch?: typeof fetch } = {}
 ): Promise<T> {
 	const ttl = opts.ttl ?? 60_000;
 	const key = `${opts.accept ?? ''}|${path}`;
@@ -44,7 +44,7 @@ export async function gh<T>(
 		);
 	}
 
-	const res = await fetch(API + path, {
+	const res = await (opts.fetch ?? fetch)(API + path, {
 		headers: {
 			Authorization: `Bearer ${TOKEN}`,
 			Accept: opts.accept ?? 'application/vnd.github+json',
@@ -76,7 +76,12 @@ export async function gh<T>(
 
 export async function search<T>(
 	query: string,
-	opts: { kind?: 'issues' | 'commits'; perPage?: number; page?: number } = {}
+	opts: {
+		kind?: 'issues' | 'commits';
+		perPage?: number;
+		page?: number;
+		fetch?: typeof fetch;
+	} = {}
 ): Promise<{ total_count: number; items: T[] }> {
 	const perPage = opts.perPage ?? 40;
 	const page = opts.page ?? 1;
@@ -84,5 +89,5 @@ export async function search<T>(
 		opts.kind === 'commits'
 			? `/search/commits?q=${encodeURIComponent(query)}&sort=committer-date&order=desc&per_page=${perPage}&page=${page}`
 			: `/search/issues?q=${encodeURIComponent(query)}&sort=updated&order=desc&per_page=${perPage}&page=${page}`;
-	return gh(path, { ttl: 60_000 });
+	return gh(path, { ttl: 60_000, fetch: opts.fetch });
 }
